@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f1f1f1;
+  font: 16px Arial, Helvetica, sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 10px;
+}
+
+.container h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+form {
+  width: 100%;
+}
+
+.input-name {
+  width: 100%;
+  border: 1px solid #707294;
+  background: #fff;
+  margin-bottom: 8px;
+  height: 38px;
+  padding: 0 6px;
+}
+
+.categories {
+  border: 1px solid #707294;
+  background: #fff;
+  padding: 1px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.categories ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.categories ul li {
+  border: 1px solid #c5c7dc;
+  background: #d5d7ec;
+  padding: 0 15px;
+  height: 32px;
+  line-height: 32px;
+  margin: 1px;
+  color: #3960cc;
+}
+
+.categories input {
+  margin: 1px;
+  border: 0;
+  height: 32px;
+  padding: 0 5px;
+  background: transparent;
+  flex: 1;
+}
+.content-list-category {
+  width: 100%;
+  position: relative;
+}
+
+.list-categories {
+  width: 100%;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #707294;
+  border-top: 0;
+  background: #f9fafc;
+  position: absolute;
+  top: 0;
+}
+
+.list-categories li {
+  flex: 1;
+  padding: 8px 10px;
+  color: #333;
+  cursor: pointer;
+}
+
+.list-categories li + li {
+  border-top: 1px solid #888aa8;
+}
+
+.list-categories li.list-loading {
+  text-align: center;
+  font-weight: bold;
+  color: #666877;
+}
+
+.list-categories li:hover {
+  background: #f3f5fd;
+}
+
+.list-categories li.list-loading:hover {
+  background: #f9fafc;
+  cursor: default;
+}
+
+button {
+  margin-top: 16px;
+  width: 100%;
+  border: 0;
+  background: #505274;
+  margin-bottom: 8px;
+  height: 44px;
+  text-align: center;
+  color: #f5f5f5;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 50px;
+}
+
+button:hover {
+  background: #606284;
+}
+
+.list-users {
+  width: 100%;
+}
+
+.list-users h2 {
+  font-size: 20px;
+}
+
+.list-users ul {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #333;
+  padding: 10px 0;
+}
+
+.list-users ul:last-child {
+  border: 0;
+}
+
+.list-users ul li {
+  padding: 4px 12px;
+}
+
+.list-users ul li + li {
+  border-left: 1px solid #333;
+}

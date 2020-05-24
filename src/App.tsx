@@ -1,26 +1,167 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  Fragment,
+} from 'react';
+import './styles.css';
+import api from './services/api';
 
-function App() {
+interface GetCategories {
+  name: string;
+}
+
+interface IUserCategory {
+  category: {
+    name: string;
+  };
+}
+
+type IUser = {
+  name: string;
+  user_category: IUserCategory[];
+}[];
+
+const App: React.FC = () => {
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [allCategories, setAllCategories] = useState<GetCategories[]>([]);
+  const [findCategories, setFindCategories] = useState<GetCategories[]>([]);
+  const refCategory = useRef<HTMLInputElement>(null);
+  const refName = useRef<HTMLInputElement>(null);
+
+  const [categories, setCategories] = useState<string[]>([]);
+
+  const [users, setUsers] = useState<IUser>([]);
+
+  const loadCategories = useCallback(async (): Promise<void> => {
+    const getCategories = await api.get<GetCategories[]>('categories');
+
+    setAllCategories(getCategories.data);
+  }, []);
+
+  useEffect(() => {
+    if (category.trim() !== '' && allCategories.length === 0) {
+      setLoading(true);
+      loadCategories();
+
+      setLoading(false);
+    }
+
+    const matchCategories = allCategories.filter(
+      cat => category.trim() !== '' && cat.name.includes(category),
+    );
+
+    setFindCategories(matchCategories);
+  }, [category, allCategories, loadCategories]);
+
+  function handleListCategory(saveCategory: string, charCode: number): void {
+    if (charCode === 13) {
+      const haveSave = categories.find(cat => cat === saveCategory);
+
+      if (!haveSave) setCategories([...categories, saveCategory]);
+
+      if (refCategory.current) refCategory.current.focus();
+      setFindCategories([]);
+      setCategory('');
+    }
+  }
+
+  useEffect(() => {
+    categories.forEach(cat => {
+      setAllCategories(prevState =>
+        prevState.filter(state => state.name !== cat),
+      );
+    });
+  }, [categories]);
+
+  const loadUsers = useCallback(async (): Promise<void> => {
+    const user = await api.get('users');
+    setUsers(user.data);
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    await api.post('users', {
+      name,
+      categories,
+    });
+    setCategories([]);
+    setName('');
+    setCategory('');
+    setFindCategories([]);
+    loadUsers();
+    loadCategories();
+  }, [name, categories, loadUsers, loadCategories]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1>Skills Search</h1>
+      <input
+        className="input-name"
+        placeholder="Your Name"
+        onChange={e => setName(e.target.value)}
+        value={name}
+        ref={refName}
+      />
+
+      <div className="categories">
+        <ul>
+          {categories.map(categorySave => (
+            <li key={categorySave}>{categorySave}</li>
+          ))}
+        </ul>
+        <input
+          placeholder="Put your skills"
+          onChange={e => setCategory(e.target.value)}
+          value={category}
+          ref={refCategory}
+          onKeyPress={e => handleListCategory(category, e.charCode)}
+        />
+      </div>
+
+      {(loading || findCategories.length > 0) && (
+        <div className="content-list-category">
+          <ul className="list-categories">
+            {loading && <li className="list-loading">Loading...</li>}
+            {findCategories.map(({ name: nameCategory }) => (
+              <li
+                key={nameCategory}
+                onClick={() => handleListCategory(nameCategory, 13)}
+                role="presentation"
+              >
+                {nameCategory}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <button type="button" onClick={handleSubmit}>
+        SUBSCRIBE
+      </button>
+
+      <h1>List Users</h1>
+
+      <div className="list-users">
+        {users.map((user, index) => (
+          <Fragment key={user.name + index.toString()}>
+            <h2>{user.name}</h2>
+            <ul>
+              {user.user_category.map(({ category: { name: catName } }, i) => (
+                <li key={i.toString() + catName}>{catName}</li>
+              ))}
+            </ul>
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
