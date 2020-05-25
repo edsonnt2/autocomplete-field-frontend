@@ -36,51 +36,72 @@ const App: React.FC = () => {
 
   const [users, setUsers] = useState<IUser>([]);
 
-  const loadCategories = useCallback(async (): Promise<void> => {
-    const getCategories = await api.get<GetCategories[]>('categories');
+  const handleListCategory = useCallback(
+    (saveCategory: string, charCode: number) => {
+      if (charCode === 13 && saveCategory.trim() !== '') {
+        const haveSave = categories.find(cat => cat === saveCategory);
 
-    setAllCategories(getCategories.data);
-  }, []);
+        if (!haveSave) setCategories([...categories, saveCategory]);
 
-  useEffect(() => {
-    if (category.trim() !== '' && allCategories.length === 0) {
-      setLoading(true);
-      loadCategories();
-
-      setLoading(false);
-    }
-
-    const matchCategories = allCategories.filter(
-      cat => category.trim() !== '' && cat.name.includes(category),
-    );
-
-    setFindCategories(matchCategories);
-  }, [category, allCategories, loadCategories]);
-
-  function handleListCategory(saveCategory: string, charCode: number): void {
-    if (charCode === 13) {
-      const haveSave = categories.find(cat => cat === saveCategory);
-
-      if (!haveSave) setCategories([...categories, saveCategory]);
-
-      if (refCategory.current) refCategory.current.focus();
-      setFindCategories([]);
-      setCategory('');
-    }
-  }
-
-  useEffect(() => {
-    categories.forEach(cat => {
-      setAllCategories(prevState =>
-        prevState.filter(state => state.name !== cat),
-      );
-    });
-  }, [categories]);
+        if (refCategory.current) refCategory.current.focus();
+        setFindCategories([]);
+        setCategory('');
+      }
+    },
+    [categories],
+  );
 
   const loadUsers = useCallback(async (): Promise<void> => {
     const user = await api.get('users');
     setUsers(user.data);
   }, []);
+
+  const handleRemoveCategory = useCallback(
+    (categoryRemove: string) => {
+      setCategories(categories.filter(cat => cat !== categoryRemove));
+      if (refCategory.current) refCategory.current.focus();
+    },
+    [categories],
+  );
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  useEffect(() => {
+    if (category !== '' && findCategories.length === 0) {
+      setLoading(true);
+      const loadCategories = async (search: string): Promise<void> => {
+        const getCategories = await api.get<GetCategories[]>('categories', {
+          params: {
+            search,
+          },
+        });
+
+        setAllCategories(getCategories.data);
+      };
+
+      loadCategories(category.trim());
+      setLoading(false);
+    }
+  }, [category, findCategories.length]);
+
+  useEffect(() => {
+    const matchCategories = category.trim()
+      ? allCategories.filter(cat => {
+          const haveInCategories = categories.find(
+            getCategory => getCategory === cat.name,
+          );
+
+          return (
+            cat.name.toLowerCase().includes(category.toLowerCase().trim()) &&
+            !haveInCategories
+          );
+        })
+      : [];
+
+    setFindCategories(matchCategories);
+  }, [allCategories, categories, category]);
 
   const handleSubmit = useCallback(async () => {
     await api.post('users', {
@@ -92,12 +113,7 @@ const App: React.FC = () => {
     setCategory('');
     setFindCategories([]);
     loadUsers();
-    loadCategories();
-  }, [name, categories, loadUsers, loadCategories]);
-
-  useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+  }, [name, categories, loadUsers]);
 
   return (
     <div className="container">
@@ -113,7 +129,15 @@ const App: React.FC = () => {
       <div className="categories">
         <ul>
           {categories.map(categorySave => (
-            <li key={categorySave}>{categorySave}</li>
+            <li key={categorySave}>
+              {categorySave}
+              <span
+                onClick={() => handleRemoveCategory(categorySave)}
+                role="presentation"
+              >
+                x
+              </span>
+            </li>
           ))}
         </ul>
         <input

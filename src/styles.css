@@ -57,11 +57,35 @@ form {
 .categories ul li {
   border: 1px solid #c5c7dc;
   background: #d5d7ec;
-  padding: 0 15px;
+  padding: 0 20px 0 10px;
   height: 32px;
-  line-height: 32px;
   margin: 1px;
   color: #3960cc;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.categories ul li span {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 12px;
+  height: 13px;
+  width: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #718fe4;
+  font-weight: bold;
+  border: 1px solid #718fe4;
+  cursor: pointer;
+  transition: color, border-color 0.1s;
+}
+
+.categories ul li span:hover {
+  color: #516cb6;
+  border-color: #516cb6;
 }
 
 .categories input {
@@ -87,6 +111,8 @@ form {
   background: #f9fafc;
   position: absolute;
   top: 0;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .list-categories li {
